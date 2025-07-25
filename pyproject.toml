@@ -1,0 +1,8 @@
+[project]
+name = "artigorioml"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "notebook>=7.4.4",
+]

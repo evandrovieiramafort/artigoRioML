@@ -9,8 +9,8 @@ def gerar_toml_atualizado():
     """
     Script que tive de criar para automatizar a atualização das dependências no pyproject.toml com base no requirements.txt.
 
-    A partir do momento que o script é executado, ele atualiza o toml em tempo real. Sempre que um novo requirements.txt for
-    gerado, o código pega o conteúdo do arquivo atualizado e gera um novo pyproject.toml com o "dependencies" atualizado.
+    A partir do momento que o script é executado, ele atualiza o toml em tempo real. Sempre que um requirements.txt for
+    gerado, o código pega o conteúdo do txt atualizado e cria um pyproject.toml com o "dependencies" atualizado.
 
     IMPORTANTE:
     Execute este script sempre que as dependências do projeto forem atualizadas e um

@@ -1,19 +1,62 @@
+import os
+import glob
 import pandas as pd
 import numpy as np
 import warnings
 from typing import Callable, Dict, Any, List, Tuple
 from itables import init_notebook_mode
-
 from config.feriados import obter_feriados_ano
 
+def carregar_datasets(caminho: str, configs: dict) -> pd.DataFrame:
+    """
+    Lê todos os arquivos CSV em um diretório e concatena-os verticalmente.
+
+    Parâmetros:
+        caminho (str): Caminho do diretório onde os arquivos CSV estão localizados.
+        configs (dict): Dicionário com as configurações do pd.read_csv.
+
+    Retorna:
+        pd.DataFrame: DataFrame resultante da concatenação vertical dos arquivos.
+    """
+    padrao_busca = os.path.join(caminho, "*.csv")
+    lista_arquivos = glob.glob(padrao_busca)
+
+    if not lista_arquivos:
+        raise FileNotFoundError(f"Nenhum arquivo CSV encontrado no caminho: {caminho}")
+
+    dataframes = []
+
+    for arquivo in lista_arquivos:
+        print(f"Lendo arquivo: {arquivo}")
+        df = pd.read_csv(arquivo, **configs)
+        dataframes.append(df)
+
+    df_concatenado = pd.concat(dataframes, axis=0, ignore_index=True)
+
+    return df_concatenado
+
+def caminho_saida_figura(nome_arquivo: str) -> str:
+    """
+    Retorna o caminho completo para salvar figuras no diretório 'figs'.
+
+    Parâmetros:
+        nome_arquivo (str): Nome do arquivo da figura (incluindo extensão).
+
+    Retorna:
+        str: Caminho completo do arquivo na pasta 'figs'.
+    """
+    return os.path.join("figs", nome_arquivo)
 
 def configurar_ambiente() -> None:
     """
-        Configura o ambiente de execução do notebook:
-        - Exibe todas as colunas de DataFrames do pandas.
-        - Formata números em ponto flutuante com três casas decimais.
-        - Oculta warnings desnecessários.
-        - Ativa o modo interativo do itables para exibição de tabelas HTML.
+    Configura o ambiente de execução do notebook:
+    - Exibe todas as colunas de DataFrames do pandas.
+    - Formata números em ponto flutuante com três casas decimais.
+    - Oculta warnings desnecessários.
+    - Ativa o modo interativo do itables para exibição de tabelas HTML.
+
+    Retorna:
+        None
     """
     try:
         pd.set_option('display.max_columns', None)
@@ -27,11 +70,15 @@ def configurar_ambiente() -> None:
         print(f"[Erro] Erro inesperado ao configurar ambiente: {e}")
         raise
 
-
 def eh_feriado(row: pd.Series) -> int:
     """
     Verifica se a data da linha é um feriado nacional brasileiro.
-    Utiliza um dicionário cacheado (importado de config/feriados.py) com feriados por ano.
+
+    Parâmetros:
+        row (pd.Series): Linha do DataFrame contendo a coluna 'data_inversa'.
+
+    Retorna:
+        int: 1 se a data for feriado, 0 caso contrário.
     """
     try:
         data = pd.to_datetime(row['data_inversa']).normalize()
@@ -47,17 +94,15 @@ def eh_feriado(row: pd.Series) -> int:
 
 def mapeador(dicionario: Dict[Tuple[Any, ...], Any]) -> Callable[[Any], Any]:
     """
-    Retorna uma função de mapeamento que converte valores com base em um dicionário de tuplas como chaves.
+    Cria uma função de mapeamento baseada em um dicionário de tuplas como chaves.
 
-    O dicionário deve conter tuplas como chaves, e cada valor associado representa a categoria desejada.
-    A função resultante (`mapper`) verifica se o valor fornecido pertence a alguma das tuplas (chaves)
-    e retorna o valor correspondente.
+    Parâmetros:
+        dicionario (Dict[Tuple[Any, ...], Any]): Dicionário onde as chaves são tuplas e os valores são categorias.
+
+    Retorna:
+        Callable[[Any], Any]: Função que mapeia um valor individual para sua categoria.
     """
-
     def mapper(valor: Any) -> Any:
-        """
-        Mapeia um valor individual para sua categoria, com base no dicionário de tuplas definido.
-        """
         try:
             for chaves, resultado in dicionario.items():
                 if valor in chaves:
@@ -72,11 +117,15 @@ def mapeador(dicionario: Dict[Tuple[Any, ...], Any]) -> Callable[[Any], Any]:
 
     return mapper
 
-
 def extrair_categorias_tracado(tracado: str) -> pd.Series:
     """
-    Extrai categorias do campo 'tracado_via', retornando uma série com:
-    [condicaoPista, tipoInclinacao, tipoSuperficie, tipoManobra, tipoEstrutura]
+    Extrai categorias do campo 'tracado_via'.
+
+    Parâmetros:
+        tracado (str): Descrição do traçado da via.
+
+    Retorna:
+        pd.Series: Série com as categorias [condicaoPista, tipoInclinacao, tipoSuperficie, tipoManobra, tipoEstrutura].
     """
     condicao_pista = 'Normal'
     tipo_inclinacao = 'Plano'
@@ -120,16 +169,15 @@ def extrair_categorias_tracado(tracado: str) -> pd.Series:
         tipo_estrutura
     ])
 
-
 def categoriza_tracado_via(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Aplica a extração de categorias do traçado da via (em extrair_categorias_tracado) para cada linha do DataFrame.
-    Cria as colunas:
-    - condicaoPista
-    - tipoInclinacao
-    - tipoSuperficie
-    - tipoManobra
-    - tipoEstrutura
+    Aplica a extração de categorias do traçado da via em todas as linhas do DataFrame.
+
+    Parâmetros:
+        df (pd.DataFrame): DataFrame contendo a coluna 'tracado_via'.
+
+    Retorna:
+        pd.DataFrame: DataFrame original com as colunas adicionais [condicaoPista, tipoInclinacao, tipoSuperficie, tipoManobra, tipoEstrutura].
     """
     try:
         df[['condicaoPista', 'tipoInclinacao', 'tipoSuperficie', 'tipoManobra', 'tipoEstrutura']] = (
@@ -146,10 +194,17 @@ def categoriza_tracado_via(df: pd.DataFrame) -> pd.DataFrame:
         print(f"[Erro] Erro inesperado ao categorizar traçado da via: {e}")
         raise
 
-
 def converte_features_ciclicas(df: pd.DataFrame, colunas: List[str], valores_maximos: List[int]) -> pd.DataFrame:
     """
-        Converte variáveis cíclicas (como hora, mês, dia) em componentes senoidais (Sen, Cos).
+    Converte variáveis cíclicas (hora, mês, dia) em componentes senoides (Sen, Cos).
+
+    Parâmetros:
+        df (pd.DataFrame): DataFrame contendo as colunas a serem transformadas.
+        colunas (List[str]): Lista de nomes das colunas cíclicas.
+        valores_maximos (List[int]): Lista de valores máximos para cada coluna (ex: 24 para hora).
+
+    Retorna:
+        pd.DataFrame: DataFrame com as colunas cíclicas convertidas em componentes senoides.
     """
     try:
         for coluna, valorMaximo in zip(colunas, valores_maximos):
@@ -171,10 +226,16 @@ def converte_features_ciclicas(df: pd.DataFrame, colunas: List[str], valores_max
         print(f"[Erro] Erro inesperado na conversão cíclica das colunas {colunas}: {e}")
         raise
 
-
 def remove_outliers(df: pd.DataFrame, colunas: List[str]) -> pd.DataFrame:
     """
-        Remove outliers de colunas numéricas com base na regra do IQR (1.5 * intervalo interquartil).
+    Remove outliers de colunas numéricas com base na regra do IQR (1.5 * intervalo interquartil).
+
+    Parâmetros:
+        df (pd.DataFrame): DataFrame contendo as colunas.
+        colunas (List[str]): Lista de colunas onde será aplicada a remoção de outliers.
+
+    Retorna:
+        pd.DataFrame: DataFrame com outliers removidos.
     """
     try:
         for coluna in colunas:
@@ -197,12 +258,16 @@ def remove_outliers(df: pd.DataFrame, colunas: List[str]) -> pd.DataFrame:
         print(f"[Erro] Erro inesperado ao remover outliers das colunas {colunas}: {e}")
         raise
 
-
 def define_gravidade(row: pd.Series) -> int:
     """
-        Define a gravidade do acidente com base nas vítimas, criando o novo target para o estudo. Retorna 0 para
-        acidentes considerados não-graves e 1 para acidentes graves (AMORIM, 2019).
-        """
+    Define a gravidade do acidente com base nas vítimas, criando o novo target para o estudo.
+
+    Parâmetros:
+        row (pd.Series): Linha do DataFrame contendo as colunas 'mortos', 'feridos_graves', 'feridos_leves', 'ilesos'.
+
+    Retorna:
+        int: 1 para acidentes graves, 0 para não-graves.
+    """
     try:
         mortos = int(row.get('mortos', 0))
         feridos_graves = int(row.get('feridos_graves', 0))
@@ -222,10 +287,15 @@ def define_gravidade(row: pd.Series) -> int:
         print(f"[Erro] Erro inesperado ao definir gravidade na linha {row.name}: {e}")
         return 0
 
-
 def define_fase_do_dia(coluna: List[int]) -> List[str]:
     """
-        Determina a fase do dia (Dia ou Noite) com base na hora.
+    Determina a fase do dia (Dia ou Noite) com base na hora informada.
+
+    Parâmetros:
+        coluna (List[int]): Lista com valores de hora (0-23).
+
+    Retorna:
+        List[str]: Lista com as fases do dia correspondentes ('Dia', 'Noite', 'Desconhecido').
     """
     try:
         fase = []
@@ -242,3 +312,22 @@ def define_fase_do_dia(coluna: List[int]) -> List[str]:
     except Exception as e:
         print(f"[Erro] Erro inesperado ao definir fase do dia para valores {coluna}: {e}")
         return ['Desconhecido' for _ in coluna]
+
+def calcular_frequencia_acidente(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cria a feature 'frequenciaAcidente', que representa a frequência relativa de acidentes por BR e km.
+
+    Parâmetros:
+        df (pd.DataFrame): DataFrame contendo as colunas 'id', 'br', 'km'.
+
+    Retorna:
+        pd.DataFrame: DataFrame original com a coluna 'frequenciaAcidente' adicionada.
+    """
+    n = len(df)
+
+    df[['br', 'km']] = df[['br', 'km']].replace(',', '.', regex=True).astype(float).astype(int)
+    df['frequenciaAcidente'] = df.groupby(['br', 'km'])['id'].transform('count') / n
+
+    df['br'] = df['br'].astype(str)
+
+    return df

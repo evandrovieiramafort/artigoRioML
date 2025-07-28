@@ -226,37 +226,35 @@ def converte_features_ciclicas(df: pd.DataFrame, colunas: List[str], valores_max
         print(f"[Erro] Erro inesperado na conversão cíclica das colunas {colunas}: {e}")
         raise
 
-def remove_outliers(df: pd.DataFrame, colunas: List[str]) -> pd.DataFrame:
+def remove_outliers(df: pd.DataFrame, colunas: List[str], contar_outliers: bool = False) -> pd.DataFrame:
     """
     Remove outliers de colunas numéricas com base na regra do IQR (1.5 * intervalo interquartil).
 
     Parâmetros:
         df (pd.DataFrame): DataFrame contendo as colunas.
         colunas (List[str]): Lista de colunas onde será aplicada a remoção de outliers.
+        contar_outliers (bool): flag que define se os outliers deverão ser contados
 
     Retorna:
         pd.DataFrame: DataFrame com outliers removidos.
     """
-    try:
-        for coluna in colunas:
-            if coluna not in df.columns:
-                print(f"[Aviso] Coluna '{coluna}' não encontrada no DataFrame. Pulando remoção de outliers.")
-                continue
+    outliers_count = {}  # Dicionário para armazenar a contagem de outliers por coluna
 
-            if not np.issubdtype(df[coluna].dtype, np.number):
-                print(f"[Aviso] Coluna '{coluna}' não é numérica. Pulando remoção de outliers nessa coluna.")
-                continue
+    for coluna in colunas:
+        Q1 = df[coluna].quantile(0.25)
+        Q3 = df[coluna].quantile(0.75)
+        IQR = Q3 - Q1
+        limite_inferior = Q1 - 1.5 * IQR
+        limite_superior = Q3 + 1.5 * IQR
 
-            q1 = df[coluna].quantile(0.25)
-            q3 = df[coluna].quantile(0.75)
-            iqr = q3 - q1
-            limite_inferior = q1 - 1.5 * iqr
-            limite_superior = q3 + 1.5 * iqr
-            df = df[(df[coluna] >= limite_inferior) & (df[coluna] <= limite_superior)]
-        return df
-    except Exception as e:
-        print(f"[Erro] Erro inesperado ao remover outliers das colunas {colunas}: {e}")
-        raise
+        if contar_outliers:
+            outliers_count[coluna] = ((df[coluna] < limite_inferior) | (df[coluna] > limite_superior)).sum()
+
+        # Removendo os outliers
+        df = df[(df[coluna] >= limite_inferior) & (df[coluna] <= limite_superior)]
+
+    # Retorna os dados filtrados e a contagem de outliers (se solicitado)
+    return (df, outliers_count) if contar_outliers else df
 
 def define_gravidade(row: pd.Series) -> int:
     """

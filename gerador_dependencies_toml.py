@@ -7,14 +7,15 @@ from watchdog.events import FileSystemEventHandler
 
 def gerar_toml_atualizado():
     """
-    Script que tive de criar para automatizar a atualização das dependências no pyproject.toml com base no requirements.txt.
+    Script que criei para automatizar a atualização das dependências no pyproject.toml com base no requirements.txt.
 
     A partir do momento que o script é executado, ele atualiza o toml em tempo real. Sempre que um requirements.txt for
     gerado, o código pega o conteúdo do txt atualizado e cria um pyproject.toml com o "dependencies" atualizado.
 
     IMPORTANTE:
-    Execute este script sempre que as dependências do projeto forem atualizadas e um
-    novo requirements.txt for gerado pra manter o pyproject.toml sincronizado.
+    Adicionou alguma biblioteca?
+    1. Rode este código LOGO EM SEGUIDA
+    2. Faça o "uv pip freze > requirements.txt"
     """
     try:
         with open("pyproject.toml", "r", encoding="utf-8") as f:

@@ -1,21 +1,23 @@
 ## Objetivo
 
-Hospedar os códigos utilizados no artigo *Técnicas de Aprendizado de Máquina para Predição de Gravidade de Acidentes em Rodovias do Estado do Rio de Janeiro*, autoria de Evandro Vieira Mafort e Marco André Abud Kappel, publicado na REIC (Revista Eletrônica de Iniciação Científica).
+Hospedar os códigos utilizados no artigo *Técnicas de Aprendizado de Máquina para Predição de Gravidade de Acidentes em Rodovias do Estado do Rio de Janeiro*, de autoria de **Evandro Vieira Mafort** e **Marco André Abud Kappel**, publicado na **REIC (Revista Eletrônica de Iniciação Científica)**.
 
-O gerenciador de dependências utilizado aqui é o [UV](https://github.com/astral-sh/uv).'
+O gerenciador de dependências utilizado é o [UV](https://github.com/astral-sh/uv).
 
 ## Itens
 
-1. Dois notebooks:
-   - *notebookPrincipal*, onde foi feito todo o estudo
-   - *analiseDeDados*, onde foram geradas as figuras
+### Notebooks
+- `notebookPrincipal`: onde foi realizado todo o estudo.
+- `analiseDeDados`: responsável por gerar as figuras.
 
-2. Quatro diretórios:
-   - *config*: Diretório contendo strings de caminho de arquivo, assim como dicionários contendo as instâncias de cada algoritmo e os hiperparâmetros dos algoritmos.
-   - *data*: Onde os dados são guardados. Por motivos de boas práticas acerca de armazenamento do GitHub, esta pasta estará vazia. Baixe os datasets (indicado no artigo) e o código faz o resto.
-   - *utils*: Onde todas as funções utilizadas nos códigos estão. Todas estão devidamente documentadas com docstrings, a fim de facilitar o entendimento do que foi usado.
-   - *figs*: Local onde todas as figuras geradas nos dois notebook são armazenadas, figuras essas que são identificadas de acordo com os nomes dados no artigo.
-   
-3. Um script de geração automatizada para o *pyproject.toml* (*gerador_dependencies_toml.py* - mais detalhes na docstring das funções utilizadas).
+### Diretórios
+- `config`: contém strings de caminhos de arquivos, além dos dicionários com as instâncias dos algoritmos e seus hiperparâmetros.
+- `data`: pasta destinada aos datasets. Por boas práticas de versionamento, ela estará vazia. O artigo indica onde baixar os arquivos, e o código cuidará do restante.
+- `utils`: contém todas as funções utilizadas no projeto, devidamente documentadas com docstrings.
+- `figs`: armazena todas as figuras geradas nos notebooks, nomeadas conforme indicado no artigo.
 
-4. *O requirements.txt* contendo todas as biblliotecas usadas  no estudo.
+### Scripts
+- `gerador_dependencies_toml.py`: script automatizado para gerar o `pyproject.toml`. Detalhes adicionais podem ser encontrados nas docstrings das funções ali contidas.
+
+### Arquivos de Dependências
+- `requirements.txt`: lista todas as bibliotecas utilizadas no estudo.

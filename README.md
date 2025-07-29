@@ -1,6 +1,6 @@
 ## Objetivo
 
-Hospedar os códigos utilizados no artigo *Técnicas de Aprendizado de Máquina para Predição de Gravidade de Acidentes em Rodovias do Estado do Rio de Janeiro*, de autoria de **Evandro Vieira Mafort** e **Marco André Abud Kappel**, publicado na **REIC (Revista Eletrônica de Iniciação Científica)**.
+Hospedar os códigos utilizados no artigo *Técnicas de Aprendizado de Máquina para Predição de Gravidade de Acidentes em Rodovias do Estado do Rio de Janeiro*, de autoria de **Evandro Vieira Mafort** e **Marco André Abud Kappel**.
 
 O gerenciador de dependências utilizado é o [UV](https://github.com/astral-sh/uv).
 

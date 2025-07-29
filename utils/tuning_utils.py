@@ -28,7 +28,7 @@ def log(mensagem: str, inicio: datetime = None) -> None:
 
 def objetivo_skopt(classe_modelo, espaco_busca, X, y, n_iteracoes: int, metrica: str = "accuracy") -> dict:
     """
-    Executa a busca bayesiana (BayesSearchCV ou Skopt, a depender do algoritmo) para encontrar os melhores hiperparâmetros.
+    Executa a busca bayesiana (BayesSearchCV) para encontrar os melhores hiperparâmetros.
 
     Parâmetros:
         classe_modelo: Classe do modelo (ex: RandomForestClassifier).

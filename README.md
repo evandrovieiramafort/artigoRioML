@@ -7,8 +7,8 @@ O gerenciador de dependências utilizado é o [UV](https://github.com/astral-sh/
 ## Itens
 
 ### Notebooks
-- `notebookPrincipal`: onde foi realizado todo o estudo.
-- `analiseDeDados`: responsável por gerar as figuras.
+- `notebook_principal`: onde foi realizado todo o estudo.
+- `analise_de_dados`: responsável por gerar as figuras.
 
 ### Diretórios
 - `config`: contém strings de caminhos de arquivos, além dos dicionários com as instâncias dos algoritmos e seus hiperparâmetros.

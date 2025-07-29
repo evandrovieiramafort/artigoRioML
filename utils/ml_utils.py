@@ -122,10 +122,8 @@ def validador_cruzado(modelo, X, y, n_splits=5, exibir_resultados=True):
     """
     
     kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=2024)
-    resultados = {}
 
     lista_acuracia, lista_auc_roc = [], []
-    lista_auc_roc_std = []
     lista_precisao, lista_recall, lista_f1 = [], [], []
     lista_matrizes = []
     lista_fpr, lista_tpr = [], []
